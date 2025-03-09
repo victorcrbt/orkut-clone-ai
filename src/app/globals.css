@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --foreground: #ffffff;
-  --background: #000000;
+  --foreground: #333333;
+  --background: #e8eefa;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -43,30 +43,4 @@ a {
   html {
     color-scheme: dark;
   }
-}
-
-/* Estilo específico para botões no estilo Orkut */
-.orkut-button {
-  background-color: #3b5998;
-  color: white;
-  border: none;
-  padding: 5px 15px;
-  font-size: 0.9rem;
-  cursor: pointer;
-}
-
-/* Estilo específico para inputs no estilo Orkut */
-.orkut-input {
-  border: 1px solid #cccccc;
-  padding: 5px;
-  font-size: 0.9rem;
-  background-color: white;
-  color: black;
-}
-
-/* Logo Orkut */
-.orkut-logo {
-  color: #ed2590;
-  font-weight: bold;
-  font-size: 2.5rem;
 }
