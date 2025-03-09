@@ -2,14 +2,19 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '../firebase/AuthContext';
 
 export default function OrkutHeader() {
   const router = useRouter();
+  const { logout } = useAuth();
 
-  const handleLogout = () => {
-    // Limpar a sessão e redirecionar para o login
-    sessionStorage.removeItem('currentUser');
-    router.push('/');
+  const handleLogout = async () => {
+    try {
+      await logout();
+      router.push('/');
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+    }
   };
 
   return (

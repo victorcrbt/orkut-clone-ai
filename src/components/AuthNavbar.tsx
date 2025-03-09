@@ -47,7 +47,7 @@ export default function AuthNavbar() {
           ) : (
             <>
               <Link 
-                href="/auth/login"
+                href="/"
                 className="text-pink-500 hover:text-pink-700 transition-colors"
               >
                 Login

@@ -74,7 +74,7 @@ export default function ResetPassword() {
         
         <div className="mt-6 text-center">
           <p className="text-gray-600">
-            <Link href="/auth/login" className="text-pink-500 hover:underline">
+            <Link href="/" className="text-pink-500 hover:underline">
               Voltar para o login
             </Link>
           </p>
