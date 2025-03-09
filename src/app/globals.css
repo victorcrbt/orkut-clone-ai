@@ -5,6 +5,9 @@
 :root {
   --foreground: #333333;
   --background: #e8eefa;
+  --orkut-blue: #6e83b7;
+  --orkut-blue-dark: #315c99;
+  --orkut-link: #315c99;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -23,9 +26,10 @@ body {
 }
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Verdana', 'Arial', 'Helvetica', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-size: 11px;
 }
 
 * {
@@ -35,7 +39,7 @@ body {
 }
 
 a {
-  color: #3b5998;
+  color: var(--orkut-link);
   text-decoration: none;
 }
 
@@ -43,4 +47,9 @@ a {
   html {
     color-scheme: dark;
   }
+}
+
+/* Ajustes específicos para o Orkut */
+.orkut-rounded {
+  border-radius: 6px; /* Cantos arredondados característicos do Orkut */
 }
