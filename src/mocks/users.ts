@@ -40,6 +40,6 @@ export function authenticateUser(email: string, password: string): User | null {
   if (!user) return null;
   
   // Não retornar a senha para o cliente
-  const { password: _, ...userWithoutPassword } = user;
+  const { password: _password, ...userWithoutPassword } = user;
   return userWithoutPassword as User;
 } 

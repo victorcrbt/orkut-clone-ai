@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { User } from '@self/mocks/users';
@@ -13,7 +12,6 @@ import { useAuth } from '@self/firebase/AuthContext';
 export default function Dashboard() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
   const { currentUser } = useAuth();
 
   useEffect(() => {
