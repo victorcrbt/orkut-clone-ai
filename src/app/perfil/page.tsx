@@ -10,10 +10,14 @@ import ProtectedRoute from '@self/components/ProtectedRoute';
 import { useAuth } from '@self/firebase/AuthContext';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { getUserFriends, UserProfile } from '@self/firebase/userService';
+import { getUserProfile, getPendingFriendRequests } from '@self/firebase/userService';
+import { getUserCommunities, Community } from '@self/firebase/communityService';
 
 export default function PerfilPage() {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [userFriends, setUserFriends] = useState<UserProfile[]>([]);
+  const [pendingRequests, setPendingRequests] = useState<UserProfile[]>([]);
+  const [userCommunities, setUserCommunities] = useState<Community[]>([]);
   const [loading, setLoading] = useState(true);
   const { currentUser } = useAuth();
   const router = useRouter();
@@ -48,6 +52,14 @@ export default function PerfilPage() {
           // Carregar amigos do usuário
           const friends = await getUserFriends(currentUser.uid);
           setUserFriends(friends);
+          
+          // Buscar solicitações pendentes
+          const requests = await getPendingFriendRequests(currentUser.uid);
+          setPendingRequests(requests);
+          
+          // Buscar comunidades do usuário
+          const communities = await getUserCommunities(currentUser.uid);
+          setUserCommunities(communities);
         } else {
           console.error("Perfil do usuário não encontrado");
           router.push('/complete-profile');
@@ -280,6 +292,45 @@ export default function PerfilPage() {
                       </div>
                     </div>
                   )}
+                </div>
+
+                <div className="bg-white p-4 shadow-sm rounded-md mb-4">
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <h3 className="text-sm text-[#315c99] font-semibold">Comunidades ({userCommunities.length})</h3>
+                      <Link href="/comunidades" className="text-xs text-[#315c99] hover:underline">
+                        ver todas
+                      </Link>
+                    </div>
+                    
+                    {userCommunities.length === 0 ? (
+                      <div className="bg-gray-50 p-2 rounded text-center">
+                        <p className="text-xs text-gray-500 mb-1">Você ainda não participa de nenhuma comunidade.</p>
+                        <Link href="/comunidades" className="text-xs text-[#315c99] font-medium hover:underline">
+                          Descobrir comunidades
+                        </Link>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-3 gap-2">
+                        {userCommunities.slice(0, 9).map((community) => (
+                          <Link href={`/comunidades/${community.id}`} key={community.id} className="text-center">
+                            <div className="mb-1">
+                              <Image
+                                src={community.photoURL || "https://via.placeholder.com/50x50/6e83b7/FFFFFF?text=C"}
+                                alt={community.name}
+                                width={50}
+                                height={50}
+                                className="border border-gray-300 mx-auto"
+                              />
+                            </div>
+                            <span className="text-xs text-[#315c99] hover:underline line-clamp-1">
+                              {community.name}
+                            </span>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

@@ -32,6 +32,7 @@ export interface UserProfile {
   friends?: string[];
   friendRequests?: string[];
   pendingRequests?: string[];
+  communities?: string[]; // IDs das comunidades que o usuário participa
 }
 
 /**

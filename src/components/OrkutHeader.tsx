@@ -78,7 +78,7 @@ export default function OrkutHeader() {
                   </span>
                 )}
               </Link>
-              <Link href="#" className="text-white hover:underline text-[11px]">Comunidades</Link>
+              <Link href="/comunidades" className="text-white hover:underline text-[11px]">Comunidades</Link>
             </nav>
           </div>
 
@@ -145,7 +145,7 @@ export default function OrkutHeader() {
                   )}
                 </Link>
               </li>
-              <li><Link href="#" className="text-white hover:underline text-[11px] block">Comunidades</Link></li>
+              <li><Link href="/comunidades" className="text-white hover:underline text-[11px] block">Comunidades</Link></li>
             </ul>
           </nav>
           

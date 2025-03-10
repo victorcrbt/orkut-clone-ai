@@ -315,8 +315,8 @@ export default function Dashboard() {
                       minhas comunidades <span className="text-[#315c99]">(2)</span>
                     </h3>
                     <div className="flex items-center">
-                      <Link href="#" className="text-[10px] text-[#315c99] hover:underline mr-1">ver todas</Link>
-                      <Link href="#" className="text-[10px] text-[#315c99] hover:underline">gerenciar</Link>
+                      <Link href="/comunidades" className="text-[10px] text-[#315c99] hover:underline mr-1">ver todas</Link>
+                      <Link href="/comunidades/gerenciar" className="text-[10px] text-[#315c99] hover:underline">gerenciar</Link>
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-2">
