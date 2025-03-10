@@ -12,7 +12,8 @@ import {
   searchUsers, 
   UserProfile, 
   sendFriendRequest, 
-  getUserProfile 
+  getUserProfile,
+  updateAllUsersSearchFields
 } from '@self/firebase/userService';
 
 export default function BuscarUsuariosPage() {
@@ -59,6 +60,7 @@ export default function BuscarUsuariosPage() {
     setLoading(true);
     setSearchResults([]);
     setErrorMessage('');
+    setSuccessMessage('');
     
     try {
       const results = await searchUsers(searchQuery);
@@ -71,11 +73,15 @@ export default function BuscarUsuariosPage() {
       setSearchResults(filteredResults);
       
       if (filteredResults.length === 0) {
-        setErrorMessage('Nenhum usuário encontrado com este nome.');
+        setErrorMessage(`Nenhum usuário encontrado para "${searchQuery}". Tente outros termos ou verifique a ortografia.`);
+      } else if (filteredResults.length === 1) {
+        setSuccessMessage(`1 usuário encontrado para "${searchQuery}".`);
+      } else {
+        setSuccessMessage(`${filteredResults.length} usuários encontrados para "${searchQuery}".`);
       }
     } catch (error) {
       console.error('Erro ao buscar usuários:', error);
-      setErrorMessage('Ocorreu um erro ao buscar usuários. Tente novamente.');
+      setErrorMessage('Ocorreu um erro ao buscar usuários. Por favor, tente novamente mais tarde.');
     } finally {
       setLoading(false);
     }
@@ -115,10 +121,37 @@ export default function BuscarUsuariosPage() {
     }
   };
 
+  // Função para atualizar índices de busca (apenas para administradores)
+  const handleUpdateSearchIndices = async () => {
+    if (!currentUser || !currentUser.email) return;
+    
+    // Verifique se o usuário tem permissões administrativas (opcional)
+    // Esta é uma verificação básica, pode ser melhorada
+    const adminEmails = ['seu-email-admin@exemplo.com'];
+    
+    if (!adminEmails.includes(currentUser.email)) {
+      setErrorMessage('Você não tem permissão para realizar esta operação.');
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      await updateAllUsersSearchFields();
+      setSuccessMessage('Índices de busca atualizados com sucesso!');
+    } catch (error) {
+      console.error('Erro ao atualizar índices de busca:', error);
+      setErrorMessage('Erro ao atualizar índices de busca.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Verifica se já existe solicitação pendente para este usuário
   const isPendingRequest = (userId: string) => {
     return pendingRequests.includes(userId);
   };
+
+  const isAdminUser = currentUser?.email === 'seu-email-admin@exemplo.com';
 
   return (
     <ProtectedRoute>
@@ -145,6 +178,19 @@ export default function BuscarUsuariosPage() {
                 {loading ? 'Buscando...' : 'Buscar'}
               </button>
             </form>
+            
+            {/* Botão de administrador para atualizar índices (visível apenas para admins) */}
+            {isAdminUser && (
+              <div className="mt-2 mb-4 text-right">
+                <button
+                  onClick={handleUpdateSearchIndices}
+                  className="bg-gray-200 text-gray-700 text-xs px-3 py-1 rounded hover:bg-gray-300"
+                  disabled={loading}
+                >
+                  Atualizar índices de busca
+                </button>
+              </div>
+            )}
             
             {/* Mensagens de sucesso e erro */}
             {errorMessage && (

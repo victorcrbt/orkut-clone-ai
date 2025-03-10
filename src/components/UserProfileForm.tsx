@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { getFirestore, doc, setDoc } from 'firebase/firestore';
 import { useAuth } from '@self/firebase/AuthContext';
+import { updateUserSearchField } from '../firebase/userService';
 
 interface UserProfileFormProps {
   onComplete: () => void;
@@ -36,12 +37,15 @@ const UserProfileForm = ({ onComplete }: UserProfileFormProps) => {
         relationship,
         bio,
         country,
+        displayNameLower: name.toLowerCase(),
         profileCompleted: true,
         updatedAt: new Date().toISOString()
       };
       
       const db = getFirestore();
       await setDoc(doc(db, "users", currentUser.uid), userData, { merge: true });
+      
+      await updateUserSearchField(currentUser.uid, name);
       
       // Salvar as informações localmente se necessário
       sessionStorage.setItem('currentUser', JSON.stringify(userData));

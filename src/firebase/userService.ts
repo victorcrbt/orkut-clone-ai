@@ -13,7 +13,8 @@ import {
   orderBy,
   limit,
   startAt,
-  endAt
+  endAt,
+  writeBatch
 } from 'firebase/firestore';
 import { db } from './config';
 
@@ -34,6 +35,23 @@ export interface UserProfile {
 }
 
 /**
+ * Atualiza o campo de busca no documento do usuário
+ * @param uid ID do usuário
+ * @param displayName Nome de exibição atual
+ */
+export async function updateUserSearchField(uid: string, displayName: string): Promise<void> {
+  try {
+    const userRef = doc(db, "users", uid);
+    await updateDoc(userRef, {
+      displayNameLower: displayName.toLowerCase(),
+      // Podemos adicionar outros campos para facilitar a busca se necessário
+    });
+  } catch (error) {
+    console.error("Erro ao atualizar campo de busca:", error);
+  }
+}
+
+/**
  * Busca usuários pelo nome de exibição
  * @param searchTerm Termo de busca
  * @param maxResults Número máximo de resultados (padrão: 10)
@@ -45,24 +63,61 @@ export async function searchUsers(searchTerm: string, maxResults: number = 10): 
     const searchTermLower = searchTerm.toLowerCase();
     const usersRef = collection(db, "users");
     
-    // A busca é feita com base no início do displayName
+    // Tentativa de usar a abordagem 2 (mais eficiente) se o campo displayNameLower existir
+    try {
+      // Abordagem 2: Usando campo displayNameLower para busca parcial mais eficiente
+      const q2 = query(
+        usersRef,
+        orderBy("displayNameLower"),
+        startAt(searchTermLower),
+        endAt(searchTermLower + '\uf8ff'),
+        limit(maxResults)
+      );
+      
+      const querySnapshot2 = await getDocs(q2);
+      if (!querySnapshot2.empty) {
+        const users: UserProfile[] = [];
+        querySnapshot2.forEach((doc) => {
+          const userData = doc.data() as UserProfile;
+          users.push(userData);
+        });
+        
+        // Se encontramos resultados, retornamos
+        if (users.length > 0) {
+          return users;
+        }
+      }
+    } catch (indexError) {
+      // Se der erro na abordagem 2 (provavelmente pela falta de índice),
+      // continuamos com a abordagem 1
+      console.warn("Usando método de busca alternativo:", indexError);
+    }
+    
+    // Abordagem 1: Busca usando um range amplo e filtro client-side
+    // Isso permite buscas parciais em qualquer parte do nome
     const q = query(
       usersRef,
-      orderBy("displayName"),
-      startAt(searchTermLower),
-      endAt(searchTermLower + '\uf8ff'),
-      limit(maxResults)
+      limit(100) // Limite mais alto para depois filtrar
     );
 
     const querySnapshot = await getDocs(q);
     const users: UserProfile[] = [];
     
+    // Filtra os resultados no lado do cliente para permitir busca parcial
     querySnapshot.forEach((doc) => {
       const userData = doc.data() as UserProfile;
-      users.push(userData);
+      
+      // Verifica se o displayName contém o termo de busca (case insensitive)
+      if (userData.displayName && 
+          userData.displayName.toLowerCase().includes(searchTermLower)) {
+        users.push(userData);
+      }
     });
     
-    return users;
+    // Ordenação e limite dos resultados
+    return users
+      .sort((a, b) => a.displayName.localeCompare(b.displayName))
+      .slice(0, maxResults);
   } catch (error) {
     console.error("Erro ao buscar usuários:", error);
     return [];
@@ -253,5 +308,39 @@ export async function getPendingFriendRequests(uid: string): Promise<UserProfile
   } catch (error) {
     console.error("Erro ao obter solicitações de amizade pendentes:", error);
     return [];
+  }
+}
+
+/**
+ * Atualiza os campos de busca para todos os usuários existentes
+ * Esta função deve ser executada uma vez para adicionar o campo displayNameLower
+ * a todos os usuários existentes
+ */
+export async function updateAllUsersSearchFields(): Promise<void> {
+  try {
+    const usersRef = collection(db, "users");
+    const querySnapshot = await getDocs(usersRef);
+    
+    const batch = writeBatch(db);
+    let count = 0;
+    
+    querySnapshot.forEach((userDoc) => {
+      const userData = userDoc.data() as UserProfile;
+      
+      if (userData.displayName) {
+        const userRef = doc(db, "users", userData.uid);
+        batch.update(userRef, {
+          displayNameLower: userData.displayName.toLowerCase()
+        });
+        count++;
+      }
+    });
+    
+    if (count > 0) {
+      await batch.commit();
+      console.log(`Campos de busca atualizados para ${count} usuários.`);
+    }
+  } catch (error) {
+    console.error("Erro ao atualizar campos de busca:", error);
   }
 } 

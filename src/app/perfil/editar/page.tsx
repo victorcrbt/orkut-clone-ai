@@ -7,6 +7,7 @@ import { useAuth } from '@self/firebase/AuthContext';
 import OrkutHeader from '@self/components/OrkutHeader';
 import OrkutFooter from '@self/components/OrkutFooter';
 import ProtectedRoute from '@self/components/ProtectedRoute';
+import { updateUserSearchField } from '@self/firebase/userService';
 
 interface UserProfile {
   uid: string;
@@ -101,6 +102,7 @@ export default function EditarPerfilPage() {
         relationship,
         bio,
         country,
+        displayNameLower: name.toLowerCase(),
         profileCompleted: true,
         updatedAt: new Date().toISOString()
       };
@@ -108,18 +110,13 @@ export default function EditarPerfilPage() {
       const db = getFirestore();
       await updateDoc(doc(db, "users", currentUser.uid), userData);
       
-      // Atualizar as informações localmente
-      sessionStorage.setItem('currentUser', JSON.stringify(userData));
+      await updateUserSearchField(currentUser.uid, name);
       
       setSuccess(true);
-      
-      // Redirecionar após 2 segundos
-      setTimeout(() => {
-        router.push('/perfil');
-      }, 2000);
+      setTimeout(() => setSuccess(false), 3000);
     } catch (error) {
-      console.error("Erro ao salvar dados do perfil:", error);
-      setError("Erro ao salvar dados. Tente novamente.");
+      console.error('Erro ao atualizar perfil:', error);
+      setError('Não foi possível atualizar o perfil. Tente novamente.');
     } finally {
       setIsSubmitting(false);
     }
