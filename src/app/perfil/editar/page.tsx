@@ -164,7 +164,7 @@ export default function EditarPerfilPage() {
                   id="name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded focus:outline-none focus:border-[#6d84b4] bg-white text-black"
+                  className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded focus:outline-none focus:border-[#6d84b4] bg-[#f1f9ff] text-black"
                   required
                 />
               </div>
@@ -178,7 +178,7 @@ export default function EditarPerfilPage() {
                   id="birthDate"
                   value={birthDate}
                   onChange={(e) => setBirthDate(e.target.value)}
-                  className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded focus:outline-none focus:border-[#6d84b4] bg-white text-black"
+                  className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded focus:outline-none focus:border-[#6d84b4] bg-[#f1f9ff] text-black"
                   required
                 />
               </div>
@@ -191,7 +191,7 @@ export default function EditarPerfilPage() {
                   id="gender"
                   value={gender}
                   onChange={(e) => setGender(e.target.value)}
-                  className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded focus:outline-none focus:border-[#6d84b4] bg-white text-black"
+                  className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded focus:outline-none focus:border-[#6d84b4] bg-[#f1f9ff] text-black"
                   required
                 >
                   <option value="">Selecione...</option>
@@ -210,7 +210,7 @@ export default function EditarPerfilPage() {
                   id="relationship"
                   value={relationship}
                   onChange={(e) => setRelationship(e.target.value)}
-                  className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded focus:outline-none focus:border-[#6d84b4] bg-white text-black"
+                  className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded focus:outline-none focus:border-[#6d84b4] bg-[#f1f9ff] text-black"
                   required
                 >
                   <option value="">Selecione...</option>
@@ -231,7 +231,7 @@ export default function EditarPerfilPage() {
                   id="bio"
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
-                  className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded focus:outline-none focus:border-[#6d84b4] bg-white text-black"
+                  className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded focus:outline-none focus:border-[#6d84b4] bg-[#f1f9ff] text-black"
                   rows={3}
                   maxLength={200}
                   placeholder="Conte um pouco sobre você..."
@@ -248,7 +248,7 @@ export default function EditarPerfilPage() {
                   id="country"
                   value={country}
                   onChange={(e) => setCountry(e.target.value)}
-                  className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded focus:outline-none focus:border-[#6d84b4] bg-white text-black"
+                  className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded focus:outline-none focus:border-[#6d84b4] bg-[#f1f9ff] text-black"
                   required
                 />
               </div>

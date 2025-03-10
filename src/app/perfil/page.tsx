@@ -9,21 +9,11 @@ import OrkutFooter from '@self/components/OrkutFooter';
 import ProtectedRoute from '@self/components/ProtectedRoute';
 import { useAuth } from '@self/firebase/AuthContext';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
-
-interface UserProfile {
-  uid: string;
-  email?: string;
-  displayName: string;
-  photoURL?: string;
-  birthDate?: string;
-  gender?: string;
-  relationship?: string;
-  bio?: string;
-  country?: string;
-}
+import { getUserFriends, UserProfile } from '@self/firebase/userService';
 
 export default function PerfilPage() {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [userFriends, setUserFriends] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const { currentUser } = useAuth();
   const router = useRouter();
@@ -52,7 +42,12 @@ export default function PerfilPage() {
         const userSnap = await getDoc(userRef);
         
         if (userSnap.exists()) {
-          setUserProfile(userSnap.data() as UserProfile);
+          const profileData = userSnap.data() as UserProfile;
+          setUserProfile(profileData);
+          
+          // Carregar amigos do usuário
+          const friends = await getUserFriends(currentUser.uid);
+          setUserFriends(friends);
         } else {
           console.error("Perfil do usuário não encontrado");
           router.push('/complete-profile');
@@ -127,6 +122,10 @@ export default function PerfilPage() {
                     <Link href="/perfil" className="text-[#315c99] hover:underline">perfil</Link>
                   </li>
                   <li className="flex items-center text-xs w-1/2 md:w-auto">
+                    <span className="w-4 h-4 mr-1 flex items-center justify-center text-[#315c99]">👥</span>
+                    <Link href="/amigos" className="text-[#315c99] hover:underline">amigos</Link>
+                  </li>
+                  <li className="flex items-center text-xs w-1/2 md:w-auto">
                     <span className="w-4 h-4 mr-1 flex items-center justify-center text-[#315c99]">✉️</span>
                     <Link href="#" className="text-[#315c99] hover:underline">recados</Link>
                   </li>
@@ -189,70 +188,75 @@ export default function PerfilPage() {
                   </div>
                   <div className="text-xs">
                     <span className="text-gray-600">confiável</span>
-                    <span className="ml-1 text-[#315c99]">-</span>
+                    <span className="ml-1 text-[#315c99]">0</span>
                   </div>
                   <div className="text-xs">
                     <span className="text-gray-600">legal</span>
-                    <span className="ml-1 text-[#315c99]">-</span>
+                    <span className="ml-1 text-[#315c99]">0</span>
                   </div>
                   <div className="text-xs">
                     <span className="text-gray-600">sexy</span>
-                    <span className="ml-1 text-[#315c99]">-</span>
+                    <span className="ml-1 text-[#315c99]">0</span>
                   </div>
                 </div>
                 
-                {/* Box social - estilo orkut */}
-                <div className="bg-[#f1f3f8] rounded overflow-hidden mb-3">
-                  <div className="bg-[#6d84b4] px-2 py-1">
-                    <h3 className="text-white text-xs font-bold">social</h3>
-                  </div>
-                  <div className="p-3">
-                    <table className="w-full text-xs">
-                      <tbody>
-                        <tr>
-                          <td className="py-1 text-right pr-3 text-gray-600 w-1/3 sm:w-1/4 align-top">aniversário:</td>
-                          <td className="py-1">
-                            {formatBirthDate(userProfile?.birthDate)}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="py-1 text-right pr-3 text-gray-600 align-top">relacionamento:</td>
-                          <td className="py-1">{userProfile?.relationship || 'solteiro(a)'}</td>
-                        </tr>
-                        <tr>
-                          <td className="py-1 text-right pr-3 text-gray-600 align-top">quem sou eu:</td>
-                          <td className="py-1">{userProfile?.bio || 'Jornalista carioca que ama livros, músicas e filmes.'}</td>
-                        </tr>
-                        <tr>
-                          <td className="py-1 text-right pr-3 text-gray-600 align-top">país:</td>
-                          <td className="py-1">{userProfile?.country || 'Brasil'}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Coluna da direita - Em mobile fica embaixo */}
-              <div className="w-full md:w-[180px] p-3 border-t md:border-t-0 md:border-l border-gray-200">
+                {/* Informações do perfil */}
                 <div className="mb-4">
-                  <div className="flex justify-between items-center mb-2">
-                    <h3 className="text-xs font-bold text-[#315c99]">
-                      amigos <span className="text-[#315c99]">(0)</span>
-                    </h3>
-                    <Link href="#" className="text-[10px] text-[#315c99] hover:underline">ver todos</Link>
+                  <h3 className="text-sm text-[#315c99] font-semibold mb-2">Informações pessoais</h3>
+                  <div className="text-xs space-y-1">
+                    <div className="grid grid-cols-3">
+                      <span className="text-gray-600">país:</span>
+                      <span className="col-span-2">{userProfile?.country || 'Brasil'}</span>
+                    </div>
+                    <div className="grid grid-cols-3">
+                      <span className="text-gray-600">relacionamento:</span>
+                      <span className="col-span-2">{userProfile?.relationship || 'solteiro(a)'}</span>
+                    </div>
+                    <div className="grid grid-cols-3">
+                      <span className="text-gray-600">nascimento:</span>
+                      <span className="col-span-2">{formatBirthDate(userProfile?.birthDate)}</span>
+                    </div>
                   </div>
-                  <p className="text-[11px] text-gray-600">você ainda não adicionou nenhum amigo</p>
                 </div>
                 
+                {/* Amigos */}
                 <div>
                   <div className="flex justify-between items-center mb-2">
-                    <h3 className="text-xs font-bold text-[#315c99]">
-                      comunidades <span className="text-[#315c99]">(0)</span>
-                    </h3>
-                    <Link href="#" className="text-[10px] text-[#315c99] hover:underline">ver todos</Link>
+                    <h3 className="text-sm text-[#315c99] font-semibold">Amigos ({userFriends.length})</h3>
+                    {userFriends.length > 0 && (
+                      <Link href="/amigos" className="text-xs text-[#315c99] hover:underline">
+                        ver todos
+                      </Link>
+                    )}
                   </div>
-                  <p className="text-[11px] text-gray-600">você ainda não adicionou nenhuma comunidade</p>
+                  
+                  {userFriends.length === 0 ? (
+                    <div className="bg-gray-50 p-2 rounded text-center">
+                      <p className="text-xs text-gray-500 mb-1">Você ainda não tem amigos.</p>
+                      <Link href="/buscar" className="text-xs text-[#315c99] font-medium hover:underline">
+                        Clique aqui para buscar amigos
+                      </Link>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-3 sm:grid-cols-3 gap-2">
+                      {userFriends.slice(0, 9).map((friend) => (
+                        <Link href={`/perfil/${friend.uid}`} key={friend.uid} className="text-center">
+                          <div className="mb-1">
+                            <Image
+                              src={friend.photoURL || "https://via.placeholder.com/50"}
+                              alt={friend.displayName}
+                              width={50}
+                              height={50}
+                              className="border border-gray-300 mx-auto"
+                            />
+                          </div>
+                          <span className="text-xs text-[#315c99] hover:underline line-clamp-1">
+                            {friend.displayName}
+                          </span>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

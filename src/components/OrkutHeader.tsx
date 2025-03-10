@@ -9,6 +9,7 @@ export default function OrkutHeader() {
   const router = useRouter();
   const { logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const handleLogout = async () => {
     try {
@@ -21,6 +22,13 @@ export default function OrkutHeader() {
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      router.push(`/buscar?q=${encodeURIComponent(searchTerm)}`);
+    }
   };
 
   return (
@@ -47,16 +55,21 @@ export default function OrkutHeader() {
           
           {/* Elementos para desktop */}
           <div className="hidden md:flex items-center">
-            <div className="relative mr-2">
+            <form onSubmit={handleSearch} className="relative mr-2">
               <input 
                 type="text" 
                 placeholder="pesquisa do orkut"
-                className="bg-white text-gray-800 px-2 py-0.5 text-[11px] rounded-sm w-40"
+                className="bg-[#f1f9ff] text-gray-800 px-2 py-0.5 text-[11px] rounded-sm w-40"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
-              <button className="absolute right-1 top-0.5 bg-[#3b5998] text-white px-1 rounded-sm">
+              <button 
+                type="submit"
+                className="absolute right-1 top-0.5 bg-[#3b5998] text-white px-1 rounded-sm"
+              >
                 <span className="text-xs">🔍</span>
               </button>
-            </div>
+            </form>
             <button
               onClick={handleLogout}
               className="text-white hover:underline text-[11px]"
@@ -71,24 +84,29 @@ export default function OrkutHeader() {
           <ul className="flex flex-col md:flex-row md:space-x-4">
             <li className="py-1 md:py-0"><Link href="/dashboard" className="text-white hover:underline text-[11px] block">Início</Link></li>
             <li className="py-1 md:py-0"><Link href="/perfil" className="text-white hover:underline text-[11px] block">Perfil</Link></li>
-            <li className="py-1 md:py-0"><Link href="#" className="text-white hover:underline text-[11px] block">Página de recados</Link></li>
-            <li className="py-1 md:py-0"><Link href="#" className="text-white hover:underline text-[11px] block">Amigos</Link></li>
+            <li className="py-1 md:py-0"><Link href="/buscar" className="text-white hover:underline text-[11px] block">Buscar amigos</Link></li>
+            <li className="py-1 md:py-0"><Link href="/amigos" className="text-white hover:underline text-[11px] block">Amigos</Link></li>
             <li className="py-1 md:py-0"><Link href="#" className="text-white hover:underline text-[11px] block">Comunidades</Link></li>
           </ul>
         </nav>
         
         {/* Barra de pesquisa e botão de logout para mobile */}
         <div className={`${menuOpen ? 'block' : 'hidden'} md:hidden mt-2 pb-2`}>
-          <div className="relative mb-2 w-full">
+          <form onSubmit={handleSearch} className="relative mb-2 w-full">
             <input 
               type="text" 
               placeholder="pesquisa do orkut"
-              className="bg-white text-gray-800 px-2 py-1.5 text-[11px] rounded-sm w-full"
+              className="bg-[#f1f9ff] text-gray-800 px-2 py-1.5 text-[11px] rounded-sm w-full"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <button className="absolute right-1 top-1 bg-[#3b5998] text-white px-1 rounded-sm">
+            <button 
+              type="submit"
+              className="absolute right-1 top-1 bg-[#3b5998] text-white px-1 rounded-sm"
+            >
               <span className="text-xs">🔍</span>
             </button>
-          </div>
+          </form>
           <button
             onClick={handleLogout}
             className="text-white hover:underline text-[11px]"

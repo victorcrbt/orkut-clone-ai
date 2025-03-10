@@ -98,7 +98,7 @@ export default function Login() {
                 id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full sm:w-64 p-1 border border-gray-300 bg-white text-black text-xs sm:text-sm"
+                className="w-full sm:w-64 p-1 border border-gray-300 bg-[#f1f9ff] text-black text-xs sm:text-sm"
               />
             </div>
             
@@ -109,7 +109,7 @@ export default function Login() {
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full sm:w-64 p-1 border border-gray-300 bg-white text-black text-xs sm:text-sm"
+                className="w-full sm:w-64 p-1 border border-gray-300 bg-[#f1f9ff] text-black text-xs sm:text-sm"
               />
             </div>
             

@@ -72,7 +72,7 @@ const UserProfileForm = ({ onComplete }: UserProfileFormProps) => {
             id="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded focus:outline-none focus:border-[#6d84b4] bg-white text-black"
+            className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded focus:outline-none focus:border-[#6d84b4] bg-[#f1f9ff] text-black"
             required
           />
         </div>
@@ -86,7 +86,7 @@ const UserProfileForm = ({ onComplete }: UserProfileFormProps) => {
             id="birthDate"
             value={birthDate}
             onChange={(e) => setBirthDate(e.target.value)}
-            className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded focus:outline-none focus:border-[#6d84b4] bg-white text-black"
+            className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded focus:outline-none focus:border-[#6d84b4] bg-[#f1f9ff] text-black"
             required
           />
         </div>
@@ -156,7 +156,7 @@ const UserProfileForm = ({ onComplete }: UserProfileFormProps) => {
             id="country"
             value={country}
             onChange={(e) => setCountry(e.target.value)}
-            className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded focus:outline-none focus:border-[#6d84b4] bg-white text-black"
+            className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded focus:outline-none focus:border-[#6d84b4] bg-[#f1f9ff] text-black"
             required
           />
         </div>
