@@ -102,11 +102,11 @@ export default function Dashboard() {
                 <ul className="space-y-1">
                   <li className="flex items-center text-[11px]">
                     <span className="w-4 h-4 mr-1 flex items-center justify-center text-[#315c99]">✏️</span>
-                    <Link href="#" className="text-[#315c99] hover:underline">editar perfil</Link>
+                    <Link href="/perfil/editar" className="text-[#315c99] hover:underline">editar perfil</Link>
                   </li>
                   <li className="flex items-center text-[11px]">
                     <span className="w-4 h-4 mr-1 flex items-center justify-center text-[#315c99]">👤</span>
-                    <Link href="#" className="text-[#315c99] hover:underline">perfil</Link>
+                    <Link href="/perfil" className="text-[#315c99] hover:underline">perfil</Link>
                   </li>
                   <li className="flex items-center text-[11px]">
                     <span className="w-4 h-4 mr-1 flex items-center justify-center text-[#315c99]">✉️</span>

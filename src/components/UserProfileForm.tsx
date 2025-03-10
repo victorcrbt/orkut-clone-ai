@@ -56,15 +56,15 @@ const UserProfileForm = ({ onComplete }: UserProfileFormProps) => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md max-w-md mx-auto">
-      <h2 className="text-2xl font-bold text-[#315c99] mb-4">Complete seu perfil</h2>
-      <p className="mb-4 text-gray-600 text-sm">
+    <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md w-full max-w-md mx-auto">
+      <h2 className="text-xl sm:text-2xl font-bold text-[#315c99] mb-3 sm:mb-4">Complete seu perfil</h2>
+      <p className="mb-4 text-gray-600 text-xs sm:text-sm">
         Para melhorar sua experiência no Orkut, precisamos de algumas informações adicionais.
       </p>
       
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
+      <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
+        <div>
+          <label className="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2" htmlFor="name">
             Nome Completo
           </label>
           <input
@@ -72,13 +72,13 @@ const UserProfileForm = ({ onComplete }: UserProfileFormProps) => {
             id="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-[#6d84b4] bg-white text-black"
+            className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded focus:outline-none focus:border-[#6d84b4] bg-white text-black"
             required
           />
         </div>
         
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="birthDate">
+        <div>
+          <label className="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2" htmlFor="birthDate">
             Data de Nascimento
           </label>
           <input
@@ -86,20 +86,20 @@ const UserProfileForm = ({ onComplete }: UserProfileFormProps) => {
             id="birthDate"
             value={birthDate}
             onChange={(e) => setBirthDate(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-[#6d84b4] bg-white text-black"
+            className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded focus:outline-none focus:border-[#6d84b4] bg-white text-black"
             required
           />
         </div>
         
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="gender">
+        <div>
+          <label className="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2" htmlFor="gender">
             Gênero
           </label>
           <select
             id="gender"
             value={gender}
             onChange={(e) => setGender(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-[#6d84b4] bg-white text-black"
+            className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded focus:outline-none focus:border-[#6d84b4] bg-white text-black"
             required
           >
             <option value="">Selecione...</option>
@@ -110,15 +110,15 @@ const UserProfileForm = ({ onComplete }: UserProfileFormProps) => {
           </select>
         </div>
         
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="relationship">
+        <div>
+          <label className="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2" htmlFor="relationship">
             Estado Civil
           </label>
           <select
             id="relationship"
             value={relationship}
             onChange={(e) => setRelationship(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-[#6d84b4] bg-white text-black"
+            className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded focus:outline-none focus:border-[#6d84b4] bg-white text-black"
             required
           >
             <option value="">Selecione...</option>
@@ -131,15 +131,15 @@ const UserProfileForm = ({ onComplete }: UserProfileFormProps) => {
           </select>
         </div>
         
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="bio">
+        <div>
+          <label className="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2" htmlFor="bio">
             Quem sou eu
           </label>
           <textarea
             id="bio"
             value={bio}
             onChange={(e) => setBio(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-[#6d84b4] bg-white text-black"
+            className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded focus:outline-none focus:border-[#6d84b4] bg-white text-black"
             rows={3}
             maxLength={200}
             placeholder="Conte um pouco sobre você..."
@@ -147,8 +147,8 @@ const UserProfileForm = ({ onComplete }: UserProfileFormProps) => {
           />
         </div>
         
-        <div className="mb-6">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="country">
+        <div>
+          <label className="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2" htmlFor="country">
             País
           </label>
           <input
@@ -156,7 +156,7 @@ const UserProfileForm = ({ onComplete }: UserProfileFormProps) => {
             id="country"
             value={country}
             onChange={(e) => setCountry(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-[#6d84b4] bg-white text-black"
+            className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded focus:outline-none focus:border-[#6d84b4] bg-white text-black"
             required
           />
         </div>
@@ -164,7 +164,7 @@ const UserProfileForm = ({ onComplete }: UserProfileFormProps) => {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-[#6d84b4] hover:bg-[#5d74a4] text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          className="w-full bg-[#6d84b4] hover:bg-[#5d74a4] text-white font-bold text-xs sm:text-sm py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4"
         >
           {isSubmitting ? 'Salvando...' : 'Concluir Cadastro'}
         </button>

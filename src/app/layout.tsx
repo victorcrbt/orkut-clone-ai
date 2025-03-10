@@ -16,6 +16,7 @@ const robotoMono = Roboto_Mono({
 export const metadata: Metadata = {
   title: "Orkut - Conecta-se aos seus amigos e familiares",
   description: "Clone do Orkut - Rede social para conectar amigos e familiares",
+  viewport: "width=device-width, initial-scale=1, maximum-scale=1",
 };
 
 export default function RootLayout({
@@ -24,8 +25,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR">
-      <body className={`${inter.variable} ${robotoMono.variable} bg-[#e8eefa] text-black`}>
+    <html lang="pt-BR" className="overflow-x-hidden">
+      <body className={`${inter.variable} ${robotoMono.variable} bg-[#e8eefa] text-black min-h-screen w-full overflow-x-hidden`}>
         <AuthProviderClient>
           {children}
         </AuthProviderClient>
