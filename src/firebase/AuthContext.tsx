@@ -10,6 +10,7 @@ import {
   signInWithPopup,
   sendPasswordResetEmail
 } from 'firebase/auth';
+import { getFirestore, doc, setDoc } from 'firebase/firestore';
 import { auth } from './config';
 
 // Interface para o contexto de autenticação
@@ -63,7 +64,29 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Função para login com Google
   function loginWithGoogle() {
     const provider = new GoogleAuthProvider();
-    return signInWithPopup(auth, provider);
+    // Solicitando informações adicionais do perfil
+    provider.addScope('profile');
+    provider.addScope('email');
+    
+    return signInWithPopup(auth, provider)
+      .then(async (result) => {
+        const user = result.user;
+        // Obter informações do usuário Google
+        const userData = {
+          uid: user.uid,
+          email: user.email,
+          displayName: user.displayName,
+          photoURL: user.photoURL,
+          lastLogin: new Date().toISOString()
+        };
+        
+        // Aqui você pode adicionar código para salvar no Firestore
+        // Por exemplo:
+        const db = getFirestore();
+        await setDoc(doc(db, "users", user.uid), userData, { merge: true });
+        
+        return result;
+      });
   }
 
   // Função para redefinir senha

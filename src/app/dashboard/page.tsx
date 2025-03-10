@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { User } from '@self/mocks/users';
@@ -8,22 +9,64 @@ import OrkutHeader from '@self/components/OrkutHeader';
 import OrkutFooter from '@self/components/OrkutFooter';
 import ProtectedRoute from '@self/components/ProtectedRoute';
 import { useAuth } from '@self/firebase/AuthContext';
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
 
 export default function Dashboard() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const { currentUser } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
-    // Em vez de verificar o sessionStorage, usamos o contexto de autenticação
-    const storedUser = sessionStorage.getItem('currentUser');
+    const checkProfileAndLoadUser = async () => {
+      if (!currentUser) {
+        setLoading(false);
+        return;
+      }
+      
+      try {
+        // Verificar se o perfil está completo no Firestore
+        const db = getFirestore();
+        const userRef = doc(db, "users", currentUser.uid);
+        const userSnap = await getDoc(userRef);
+        
+        if (userSnap.exists()) {
+          const userData = userSnap.data();
+          
+          // Se o perfil não estiver completo, redirecionar
+          if (userData.profileCompleted !== true) {
+            router.push('/complete-profile');
+            return;
+          }
+          
+          // Usar os dados do Firestore para o usuário
+          setUser({
+            id: userData.uid,
+            email: userData.email,
+            name: userData.displayName,
+            profilePicture: userData.photoURL,
+            password: '' // Campo obrigatório na interface, mas não usado
+          });
+        } else {
+          // Se não encontrar os dados no Firestore, verificar o sessionStorage
+          const storedUser = sessionStorage.getItem('currentUser');
+          if (storedUser) {
+            setUser(JSON.parse(storedUser));
+          } else {
+            // Se não tiver dados em lugar nenhum, redirecionar para completar perfil
+            router.push('/complete-profile');
+            return;
+          }
+        }
+      } catch (error) {
+        console.error("Erro ao carregar dados do usuário:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
     
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    
-    setLoading(false);
-  }, [currentUser]);
+    checkProfileAndLoadUser();
+  }, [currentUser, router]);
 
   if (loading) {
     return (

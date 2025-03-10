@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import OrkutFooter from '@self/components/OrkutFooter';
 import { useAuth } from '../firebase/AuthContext';
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -46,8 +47,18 @@ export default function Login() {
   const handleGoogleLogin = async () => {
     try {
       setLoading(true);
-      await loginWithGoogle();
-      router.push('/dashboard');
+      const result = await loginWithGoogle();
+      
+      // Verificar se é o primeiro login ou se precisa completar o perfil
+      const db = getFirestore();
+      const userRef = doc(db, "users", result.user.uid);
+      const userSnap = await getDoc(userRef);
+      
+      if (userSnap.exists() && userSnap.data().profileCompleted === true) {
+        router.push('/dashboard');
+      } else {
+        router.push('/complete-profile');
+      }
     } catch (error) {
       console.error('Erro de login com Google:', error);
       setError('Erro ao fazer login com Google');
