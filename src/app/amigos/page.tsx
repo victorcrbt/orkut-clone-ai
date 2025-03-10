@@ -208,8 +208,11 @@ export default function AmigosPage() {
                       {friends.length === 0 ? (
                         <div className="bg-gray-50 p-4 rounded text-center">
                           <p className="text-gray-600 mb-2">Você ainda não tem amigos.</p>
-                          <Link href="/buscar" className="text-[#315c99] font-medium hover:underline">
-                            Clique aqui para buscar amigos
+                          <Link 
+                            href="/buscar" 
+                            className="inline-block bg-[#6d84b4] text-white text-xs px-3 py-1 rounded hover:bg-[#5b71a0]"
+                          >
+                            adicionar amigos
                           </Link>
                         </div>
                       ) : (

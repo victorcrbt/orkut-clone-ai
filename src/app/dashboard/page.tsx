@@ -276,8 +276,8 @@ export default function Dashboard() {
                   {userFriends.length === 0 ? (
                     <div>
                       <p className="text-[11px] text-gray-600 mb-1">você ainda não adicionou nenhum amigo</p>
-                      <Link href="/buscar">
-                        <button className="mt-1 text-[11px] text-white bg-[#6d84b4] px-2 py-1 rounded-sm">adicionar amigos</button>
+                      <Link href="/buscar" className="inline-block mt-1 text-[11px] text-white bg-[#6d84b4] px-2 py-1 rounded-sm hover:bg-[#5b71a0]">
+                        adicionar amigos
                       </Link>
                     </div>
                   ) : (
