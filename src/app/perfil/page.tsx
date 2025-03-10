@@ -28,6 +28,17 @@ export default function PerfilPage() {
   const { currentUser } = useAuth();
   const router = useRouter();
 
+  // Função para formatar a data de nascimento
+  const formatBirthDate = (dateString?: string) => {
+    if (!dateString) return '••/••/••••';
+    try {
+      return new Date(dateString).toLocaleDateString('pt-BR');
+    } catch (error) {
+      console.error("Erro ao formatar data:", error);
+      return '••/••/••••';
+    }
+  };
+
   useEffect(() => {
     const loadUserProfile = async () => {
       if (!currentUser) {
@@ -155,7 +166,7 @@ export default function PerfilPage() {
                 <div className="mb-3">
                   <h2 className="text-[#315c99] text-lg font-bold mb-1">{userProfile?.displayName}</h2>
                   <p className="text-xs text-gray-600 italic">
-                    "Where you invest your love, you invest your life."
+                    {userProfile?.bio ? `"${userProfile.bio}"` : '"Where you invest your love, you invest your life."'}
                   </p>
                 </div>
                 
@@ -201,7 +212,7 @@ export default function PerfilPage() {
                         <tr>
                           <td className="py-1 text-right pr-3 text-gray-600 w-1/3 sm:w-1/4 align-top">aniversário:</td>
                           <td className="py-1">
-                            {userProfile?.birthDate ? new Date(userProfile.birthDate).toLocaleDateString('pt-BR') : '••/••/••••'}
+                            {formatBirthDate(userProfile?.birthDate)}
                           </td>
                         </tr>
                         <tr>

@@ -39,13 +39,19 @@ export default function Dashboard() {
             return;
           }
           
-          // Usar os dados do Firestore para o usuário
+          // Usar os dados do Firestore para o usuário - incluindo dados sociais
           setUser({
             id: userData.uid,
             email: userData.email,
             name: userData.displayName,
             profilePicture: userData.photoURL,
-            password: '' // Campo obrigatório na interface, mas não usado
+            password: '', // Campo obrigatório na interface, mas não usado
+            birthDate: userData.birthDate,
+            gender: userData.gender,
+            relationship: userData.relationship,
+            bio: userData.bio,
+            country: userData.country,
+            profileCompleted: userData.profileCompleted
           });
         } else {
           // Se não encontrar os dados no Firestore, verificar o sessionStorage
@@ -76,6 +82,17 @@ export default function Dashboard() {
     );
   }
 
+  // Função para formatar a data de nascimento
+  const formatBirthDate = (dateString?: string) => {
+    if (!dateString) return '••/••/••••';
+    try {
+      return new Date(dateString).toLocaleDateString('pt-BR');
+    } catch (error) {
+      console.error("Erro ao formatar data:", error);
+      return '••/••/••••';
+    }
+  };
+
   return (
     <ProtectedRoute>
       <div className="min-h-screen flex flex-col bg-[#e8eefa]">
@@ -96,8 +113,8 @@ export default function Dashboard() {
                   className="border border-gray-300"
                 />
                 <h3 className="mt-2 text-[13px] font-bold text-[#315c99]">{user?.name || "Usuário de Teste"}</h3>
-                <p className="text-[11px] text-gray-600">feminino, solteiro(a)</p>
-                <p className="text-[11px] text-gray-600 mb-3">Brasil</p>
+                <p className="text-[11px] text-gray-600">{user?.gender || 'feminino'}, {user?.relationship || 'solteiro(a)'}</p>
+                <p className="text-[11px] text-gray-600 mb-3">{user?.country || 'Brasil'}</p>
                 
                 <ul className="space-y-1">
                   <li className="flex items-center text-[11px]">
@@ -147,11 +164,13 @@ export default function Dashboard() {
               <div className="flex-1 p-3 md:border-r border-gray-200">
                 <div className="flex justify-between items-center mb-2">
                   <h2 className="text-lg font-bold text-[#315c99]">{user?.name || "Ana Letícia Loubak"}</h2>
-                  <button className="bg-[#6d84b4] text-white px-3 py-1 text-[12px] rounded-sm">editar</button>
+                  <Link href="/perfil/editar">
+                    <button className="bg-[#6d84b4] text-white px-3 py-1 text-[12px] rounded-sm">editar</button>
+                  </Link>
                 </div>
                 
                 <div className="mb-3">
-                  <p className="text-[12px] text-gray-600 italic">"Where you invest your love, you invest your life."</p>
+                  <p className="text-[12px] text-gray-600 italic">{user?.bio ? `"${user.bio}"` : '"Where you invest your love, you invest your life."'}</p>
                 </div>
                 
                 <div className="flex flex-wrap border-t border-b border-gray-200 py-1 text-[12px]">
@@ -195,19 +214,19 @@ export default function Dashboard() {
                         <tbody>
                           <tr>
                             <td className="py-1 text-right pr-3 text-gray-600 w-1/4 align-top">aniversário:</td>
-                            <td className="py-1">••/••/••••</td>
+                            <td className="py-1">{formatBirthDate(user?.birthDate)}</td>
                           </tr>
                           <tr>
                             <td className="py-1 text-right pr-3 text-gray-600 align-top">relacionamento:</td>
-                            <td className="py-1">solteiro(a)</td>
+                            <td className="py-1">{user?.relationship || 'solteiro(a)'}</td>
                           </tr>
                           <tr>
                             <td className="py-1 text-right pr-3 text-gray-600 align-top">quem sou eu:</td>
-                            <td className="py-1">Jornalista carioca que ama livros, músicas e filmes.</td>
+                            <td className="py-1">{user?.bio || 'Jornalista carioca que ama livros, músicas e filmes.'}</td>
                           </tr>
                           <tr>
                             <td className="py-1 text-right pr-3 text-gray-600 align-top">país:</td>
-                            <td className="py-1">Brasil</td>
+                            <td className="py-1">{user?.country || 'Brasil'}</td>
                           </tr>
                         </tbody>
                       </table>
@@ -249,20 +268,18 @@ export default function Dashboard() {
                           className="object-cover"
                         />
                       </div>
-                      <p className="text-[9px] text-[#315c99] hover:underline">EU AMO CHOCOLATE</p>
-                      <p className="text-[9px] text-gray-500">(720)</p>
+                      <p className="text-[10px] text-[#315c99] hover:underline">EU AMO CHOCOLATE</p>
                     </div>
                     <div className="text-center">
                       <div className="relative w-14 h-14 mx-auto mb-1 overflow-hidden">
                         <Image
-                          src="https://via.placeholder.com/64x64/3B82F6/FFFFFF?text=ZzZ"
-                          alt="Eu Odeio Acordar Cedo"
+                          src="https://via.placeholder.com/64x64/6e83b7/FFFFFF?text=Dev"
+                          alt="Desenvolvedores"
                           fill
                           className="object-cover"
                         />
                       </div>
-                      <p className="text-[9px] text-[#315c99] hover:underline">Eu Odeio Acordar Cedo</p>
-                      <p className="text-[9px] text-gray-500">(20765)</p>
+                      <p className="text-[10px] text-[#315c99] hover:underline">Desenvolvedores</p>
                     </div>
                   </div>
                 </div>

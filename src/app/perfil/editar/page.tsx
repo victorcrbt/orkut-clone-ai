@@ -35,6 +35,18 @@ export default function EditarPerfilPage() {
   const { currentUser } = useAuth();
   const router = useRouter();
 
+  // Função para formatar a data do formato ISO para o formato yyyy-MM-dd para inputs de data
+  const formatDateForInput = (dateString?: string) => {
+    if (!dateString) return '';
+    try {
+      const date = new Date(dateString);
+      return date.toISOString().split('T')[0];
+    } catch (error) {
+      console.error("Erro ao formatar data:", error);
+      return '';
+    }
+  };
+
   useEffect(() => {
     const loadUserProfile = async () => {
       if (!currentUser) {
@@ -50,7 +62,7 @@ export default function EditarPerfilPage() {
         if (userSnap.exists()) {
           const userData = userSnap.data() as UserProfile;
           setName(userData.displayName || '');
-          setBirthDate(userData.birthDate || '');
+          setBirthDate(formatDateForInput(userData.birthDate));
           setGender(userData.gender || '');
           setRelationship(userData.relationship || '');
           setBio(userData.bio || '');

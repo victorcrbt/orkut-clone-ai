@@ -4,6 +4,12 @@ export interface User {
   password: string;
   name: string;
   profilePicture?: string;
+  birthDate?: string;
+  gender?: string;
+  relationship?: string;
+  bio?: string;
+  country?: string;
+  profileCompleted?: boolean;
 }
 
 // Usuários mockados para simular autenticação
