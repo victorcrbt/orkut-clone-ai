@@ -403,14 +403,14 @@ export default function PerfilUsuarioPage({ params }: { params: { userId: string
                     </div>
                     
                     {userCommunities.length === 0 ? (
-                      <p className="text-xs text-gray-500 italic">
+                      <p className="text-xs text-gray-500 italic bg-[#f8fafc] p-3 rounded text-center">
                         Este usuário ainda não participa de comunidades.
                       </p>
                     ) : (
                       <div className="grid grid-cols-3 sm:grid-cols-3 gap-2">
                         {userCommunities.slice(0, 9).map((community) => (
-                          <Link href={`/comunidades/${community.id}`} key={community.id} className="text-center">
-                            <div className="mb-1">
+                          <Link href={`/comunidades/${community.id}`} key={community.id} className="text-center group">
+                            <div className="mb-1 transition-transform group-hover:scale-105">
                               <Image
                                 src={community.photoURL || `https://via.placeholder.com/50x50/6e83b7/FFFFFF?text=${community.name.substring(0, 1)}`}
                                 alt={community.name}

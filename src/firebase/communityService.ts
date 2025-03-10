@@ -59,10 +59,30 @@ export async function createCommunity(communityData: Omit<Community, 'id' | 'cre
     const docRef = await addDoc(communityRef, newCommunity);
     
     // Atualizar o usuário que criou para incluir esta comunidade
-    const userRef = doc(db, "users", communityData.createdBy);
-    await updateDoc(userRef, {
-      communities: arrayUnion(docRef.id)
-    });
+    try {
+      const userRef = doc(db, "users", communityData.createdBy);
+      const userDoc = await getDoc(userRef);
+      
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        
+        // Verificar se o usuário já possui o campo communities
+        if (userData.communities) {
+          // Se já tiver o campo, apenas adicionar a nova comunidade
+          await updateDoc(userRef, {
+            communities: arrayUnion(docRef.id)
+          });
+        } else {
+          // Se não tiver o campo, criar com a nova comunidade
+          await updateDoc(userRef, {
+            communities: [docRef.id]
+          });
+        }
+      }
+    } catch (userError) {
+      console.error("Erro ao atualizar perfil do usuário, mas a comunidade foi criada:", userError);
+      // Não falharemos a criação da comunidade se a atualização do usuário falhar
+    }
     
     return docRef.id;
   } catch (error) {

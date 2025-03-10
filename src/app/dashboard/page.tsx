@@ -319,17 +319,20 @@ export default function Dashboard() {
                   </div>
                   
                   {userCommunities.length === 0 ? (
-                    <div>
-                      <p className="text-[11px] text-gray-600 mb-1">você ainda não participa de nenhuma comunidade</p>
-                      <Link href="/comunidades" className="inline-block mt-1 text-[11px] text-white bg-[#6d84b4] px-2 py-1 rounded-sm hover:bg-[#5b71a0]">
+                    <div className="bg-[#f8fafc] p-2 rounded text-center">
+                      <p className="text-[11px] text-gray-600 mb-2">você ainda não participa de nenhuma comunidade</p>
+                      <Link 
+                        href="/comunidades" 
+                        className="inline-block text-[11px] text-white bg-[#6d84b4] px-3 py-1.5 rounded-sm hover:bg-[#5b71a0] transition-colors"
+                      >
                         descobrir comunidades
                       </Link>
                     </div>
                   ) : (
                     <div className="grid grid-cols-2 gap-2">
                       {userCommunities.slice(0, 2).map((community) => (
-                        <div key={community.id} className="text-center">
-                          <div className="w-14 h-14 mx-auto mb-1 overflow-hidden">
+                        <div key={community.id} className="text-center group">
+                          <div className="w-14 h-14 mx-auto mb-1 overflow-hidden transition-transform group-hover:scale-105">
                             <Image
                               src={community.photoURL || `https://via.placeholder.com/64x64/6e83b7/FFFFFF?text=${community.name.substring(0, 1)}`}
                               alt={community.name}
@@ -338,35 +341,16 @@ export default function Dashboard() {
                               className="border border-gray-300"
                             />
                           </div>
-                          <Link href={`/comunidades/${community.id}`} className="text-[10px] text-[#315c99] hover:underline">
+                          <Link 
+                            href={`/comunidades/${community.id}`} 
+                            className="text-[10px] text-[#315c99] hover:underline line-clamp-1"
+                          >
                             {community.name}
                           </Link>
                         </div>
                       ))}
                     </div>
                   )}
-                </div>
-
-                {/* Informações rápidas */}
-                <div className="bg-[#f1f9ff] p-3 rounded mb-4">
-                  <h3 className="text-[#315c99] text-xs font-bold mb-2">informações</h3>
-                  <ul className="text-[11px] space-y-1">
-                    <li>
-                      <span className="text-gray-500">amigos:</span> <Link href="/amigos" className="text-[#315c99] hover:underline">{userFriends.length}</Link>
-                    </li>
-                    <li>
-                      <span className="text-gray-500">comunidades:</span> <Link href="/comunidades" className="text-[#315c99] hover:underline">{userCommunities.length}</Link>
-                    </li>
-                    <li>
-                      <span className="text-gray-500">recados:</span> <Link href="#" className="text-[#315c99] hover:underline">0</Link>
-                    </li>
-                    <li>
-                      <span className="text-gray-500">fotos:</span> <Link href="#" className="text-[#315c99] hover:underline">0</Link>
-                    </li>
-                    <li>
-                      <span className="text-gray-500">vídeos:</span> <Link href="#" className="text-[#315c99] hover:underline">0</Link>
-                    </li>
-                  </ul>
                 </div>
               </div>
             </div>

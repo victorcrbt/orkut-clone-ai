@@ -40,6 +40,7 @@ export default function CriarComunidadePage() {
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -60,7 +61,10 @@ export default function CriarComunidadePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!currentUser) return;
+    if (!currentUser) {
+      setError("Você precisa estar logado para criar uma comunidade.");
+      return;
+    }
     
     // Validar formulário
     if (!formData.name.trim()) {
@@ -80,6 +84,7 @@ export default function CriarComunidadePage() {
     
     setLoading(true);
     setError(null);
+    setSuccess(null);
     
     try {
       const communityData = {
@@ -94,14 +99,33 @@ export default function CriarComunidadePage() {
       const communityId = await createCommunity(communityData);
       
       if (communityId) {
-        // Redirecionar para a página da comunidade
-        router.push(`/comunidades/${communityId}`);
+        // Mostrar mensagem de sucesso antes de redirecionar
+        setSuccess("Comunidade criada com sucesso! Redirecionando...");
+        
+        // Pequeno delay para mostrar a mensagem de sucesso
+        setTimeout(() => {
+          router.push(`/comunidades/${communityId}`);
+        }, 1000);
       } else {
-        setError("Erro ao criar comunidade. Tente novamente.");
+        setError("Não foi possível criar a comunidade. Por favor, tente novamente.");
       }
     } catch (error) {
       console.error("Erro ao criar comunidade:", error);
-      setError("Erro ao criar comunidade. Tente novamente mais tarde.");
+      
+      // Tratamento de erros mais específico
+      let mensagemErro = "Erro ao criar comunidade. Tente novamente mais tarde.";
+      
+      if (error instanceof Error) {
+        if (error.message.includes("permission-denied")) {
+          mensagemErro = "Você não tem permissão para criar comunidades.";
+        } else if (error.message.includes("quota-exceeded")) {
+          mensagemErro = "Limite de comunidades excedido. Tente novamente mais tarde.";
+        } else if (error.message.includes("network")) {
+          mensagemErro = "Problema de conexão. Verifique sua internet e tente novamente.";
+        }
+      }
+      
+      setError(mensagemErro);
     } finally {
       setLoading(false);
     }
@@ -118,8 +142,24 @@ export default function CriarComunidadePage() {
             
             <form onSubmit={handleSubmit} className="space-y-4">
               {error && (
-                <div className="bg-red-100 text-red-700 p-2 rounded mb-4 text-sm">
+                <div className="bg-red-100 text-red-700 p-3 rounded mb-4 text-sm">
                   {error}
+                </div>
+              )}
+              
+              {success && (
+                <div className="bg-green-100 text-green-700 p-3 rounded mb-4 text-sm">
+                  {success}
+                </div>
+              )}
+              
+              {loading && (
+                <div className="bg-blue-50 text-blue-600 p-3 rounded mb-4 text-sm flex items-center">
+                  <svg className="animate-spin h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Criando comunidade...
                 </div>
               )}
               
@@ -133,7 +173,7 @@ export default function CriarComunidadePage() {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-[#6d84b4]"
+                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-[#6d84b4] bg-white text-gray-800"
                   maxLength={100}
                   required
                 />
@@ -149,7 +189,7 @@ export default function CriarComunidadePage() {
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-[#6d84b4]"
+                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-[#6d84b4] bg-white text-gray-800"
                   rows={4}
                   maxLength={500}
                   required
@@ -166,7 +206,7 @@ export default function CriarComunidadePage() {
                   name="category"
                   value={formData.category}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-[#6d84b4]"
+                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-[#6d84b4] bg-white text-gray-800"
                   required
                 >
                   <option value="">Selecione uma categoria</option>
