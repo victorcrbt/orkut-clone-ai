@@ -93,24 +93,29 @@ export default function OrkutHeader() {
           
           {/* Barra de pesquisa e botão de logout - desktop */}
           <div className="hidden md:flex items-center">
-            <form onSubmit={handleSearch} className="relative mr-2 flex items-center">
-              <span className="text-xs text-gray-200 mr-1">pesquisa do orkut</span>
-              <input 
-                type="text" 
-                className="bg-white text-gray-800 px-2 py-0.5 text-[11px] rounded-sm w-40"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <button 
-                type="submit"
-                className="bg-[#3b5998] text-white px-1 rounded-sm ml-1"
-              >
-                <span className="text-xs">🔍</span>
-              </button>
+            <form onSubmit={handleSearch} className="relative mr-4 flex items-center group">
+              <div className="relative flex items-center bg-white/10 hover:bg-white/20 rounded-full transition-all duration-200 pr-2">
+                <input 
+                  type="text" 
+                  placeholder="Buscar no orkut..."
+                  className="bg-transparent text-white pl-4 pr-2 py-1.5 text-sm rounded-full w-48 focus:w-64 transition-all duration-200 outline-none placeholder-white/70"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <button 
+                  type="submit"
+                  className="p-1.5 rounded-full hover:bg-white/10 transition-colors duration-200"
+                  aria-label="Buscar"
+                >
+                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </button>
+              </div>
             </form>
             <button
               onClick={handleLogout}
-              className="text-white hover:underline text-[11px]"
+              className="text-white hover:underline text-sm"
             >
               Sair
             </button>
@@ -149,25 +154,30 @@ export default function OrkutHeader() {
             </ul>
           </nav>
           
-          <form onSubmit={handleSearch} className="relative mb-2 w-full">
-            <input 
-              type="text" 
-              placeholder="pesquisa do orkut"
-              className="bg-white text-gray-800 px-2 py-1.5 text-[11px] rounded-sm w-full"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <button 
-              type="submit"
-              className="absolute right-1 top-1 bg-[#3b5998] text-white px-1 rounded-sm"
-            >
-              <span className="text-xs">🔍</span>
-            </button>
+          <form onSubmit={handleSearch} className="relative mb-3 w-full">
+            <div className="relative flex items-center bg-white/10 rounded-full">
+              <input 
+                type="text" 
+                placeholder="Buscar no orkut..."
+                className="bg-transparent text-white pl-4 pr-2 py-2 text-sm rounded-full w-full outline-none placeholder-white/70"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <button 
+                type="submit"
+                className="absolute right-2 p-1.5 rounded-full hover:bg-white/10 transition-colors duration-200"
+                aria-label="Buscar"
+              >
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </button>
+            </div>
           </form>
           
           <button
             onClick={handleLogout}
-            className="text-white hover:underline text-[11px]"
+            className="text-white hover:underline text-sm"
           >
             Sair
           </button>
