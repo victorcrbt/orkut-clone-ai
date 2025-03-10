@@ -358,4 +358,67 @@ export async function getCommunityMembers(communityId: string): Promise<Communit
     console.error("Erro ao obter membros da comunidade:", error);
     return [];
   }
+}
+
+/**
+ * Remove um membro específico de uma comunidade 
+ * Apenas donos e moderadores podem fazer isso
+ */
+export async function removeMemberFromCommunity(
+  communityId: string, 
+  memberId: string, 
+  currentUserId: string
+): Promise<boolean> {
+  try {
+    const communityRef = doc(db, "communities", communityId);
+    const communitySnap = await getDoc(communityRef);
+    
+    if (!communitySnap.exists()) {
+      return false;
+    }
+    
+    const communityData = communitySnap.data() as Community;
+    
+    // Verificar se o usuário atual é dono ou moderador
+    const isOwner = communityData.createdBy === currentUserId;
+    const isModerator = communityData.moderators.includes(currentUserId);
+    
+    if (!isOwner && !isModerator) {
+      // Apenas donos e moderadores podem remover membros
+      return false;
+    }
+    
+    // Não permitir remover o dono
+    if (memberId === communityData.createdBy) {
+      return false;
+    }
+    
+    // Moderadores só podem remover membros regulares, não outros moderadores
+    if (isModerator && !isOwner && communityData.moderators.includes(memberId)) {
+      return false;
+    }
+    
+    // Remover o membro da comunidade
+    await updateDoc(communityRef, {
+      members: arrayRemove(memberId)
+    });
+    
+    // Se o membro for moderador, remover da lista de moderadores também
+    if (communityData.moderators.includes(memberId)) {
+      await updateDoc(communityRef, {
+        moderators: arrayRemove(memberId)
+      });
+    }
+    
+    // Atualizar o usuário removido para remover esta comunidade
+    const memberRef = doc(db, "users", memberId);
+    await updateDoc(memberRef, {
+      communities: arrayRemove(communityId)
+    });
+    
+    return true;
+  } catch (error) {
+    console.error("Erro ao remover membro da comunidade:", error);
+    return false;
+  }
 } 
