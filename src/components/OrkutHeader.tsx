@@ -3,16 +3,73 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../firebase/AuthContext';
-import { useState, useEffect } from 'react';
-import { getPendingFriendRequests } from '../firebase/userService';
+import { useState, useEffect, useCallback } from 'react';
+import { getPendingFriendRequests, searchUsers, UserProfile } from '../firebase/userService';
 
 export default function OrkutHeader() {
   const router = useRouter();
   const { logout, currentUser } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [suggestions, setSuggestions] = useState<UserProfile[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [pendingRequestsCount, setPendingRequestsCount] = useState(0);
   const [loading, setLoading] = useState(true);
+
+  // Função de debounce para busca
+  const debounce = (func: Function, wait: number) => {
+    let timeout: NodeJS.Timeout;
+    return (...args: any[]) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func(...args), wait);
+    };
+  };
+
+  // Função para buscar sugestões
+  const fetchSuggestions = async (query: string) => {
+    if (query.length >= 3) {
+      try {
+        const results = await searchUsers(query);
+        setSuggestions(results.slice(0, 3));
+        setShowSuggestions(true);
+      } catch (error) {
+        console.error('Erro ao buscar sugestões:', error);
+        setSuggestions([]);
+      }
+    } else {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  };
+
+  // Debounce da função de busca
+  const debouncedFetchSuggestions = useCallback(
+    debounce((query: string) => fetchSuggestions(query), 300),
+    []
+  );
+
+  // Atualizar busca quando o termo mudar
+  useEffect(() => {
+    if (searchTerm.length >= 3) {
+      debouncedFetchSuggestions(searchTerm);
+    } else {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  }, [searchTerm]);
+
+  // Fechar sugestões quando clicar fora
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const searchContainer = document.getElementById('search-container');
+      if (searchContainer && !searchContainer.contains(event.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const loadPendingRequests = async () => {
@@ -51,6 +108,7 @@ export default function OrkutHeader() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchTerm.trim()) {
+      setShowSuggestions(false);
       router.push(`/buscar?q=${encodeURIComponent(searchTerm)}`);
     }
   };
@@ -93,26 +151,79 @@ export default function OrkutHeader() {
           
           {/* Barra de pesquisa e botão de logout - desktop */}
           <div className="hidden md:flex items-center">
-            <form onSubmit={handleSearch} className="relative mr-4 flex items-center group">
-              <div className="relative flex items-center bg-white/10 hover:bg-white/20 rounded-full transition-all duration-200 pr-2">
-                <input 
-                  type="text" 
-                  placeholder="Buscar no orkut..."
-                  className="bg-transparent text-white pl-4 pr-2 py-1.5 text-sm rounded-full w-48 focus:w-64 transition-all duration-200 outline-none placeholder-white/70"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-                <button 
-                  type="submit"
-                  className="p-1.5 rounded-full hover:bg-white/10 transition-colors duration-200"
-                  aria-label="Buscar"
-                >
-                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </button>
-              </div>
-            </form>
+            <div id="search-container" className="relative">
+              <form onSubmit={handleSearch} className="relative mr-4 flex items-center group">
+                <div className="relative flex items-center bg-white/10 hover:bg-white/20 rounded-full transition-all duration-200 pr-2">
+                  <input 
+                    type="text" 
+                    placeholder="Buscar no orkut..."
+                    className="bg-transparent text-white pl-4 pr-2 py-1.5 text-sm rounded-full w-48 focus:w-64 transition-all duration-200 outline-none placeholder-white/70"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onFocus={() => {
+                      if (searchTerm.length >= 3) {
+                        setShowSuggestions(true);
+                      }
+                    }}
+                  />
+                  <button 
+                    type="submit"
+                    className="p-1.5 rounded-full hover:bg-white/10 transition-colors duration-200 flex items-center"
+                    aria-label="Buscar"
+                  >
+                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </button>
+                </div>
+              </form>
+
+              {/* Caixa de sugestões */}
+              {showSuggestions && suggestions.length > 0 && (
+                <div className="absolute mt-1 w-[300px] bg-white rounded-lg shadow-lg overflow-hidden z-50 border border-gray-100">
+                  <div className="divide-y divide-gray-100">
+                    {suggestions.map((user) => (
+                      <Link
+                        key={user.uid}
+                        href={`/perfil/${user.uid}`}
+                        className="flex items-center px-4 py-2 hover:bg-gray-50 transition-colors duration-150"
+                        onClick={() => {
+                          setShowSuggestions(false);
+                          setSearchTerm('');
+                        }}
+                      >
+                        <img
+                          src={user.photoURL || "https://via.placeholder.com/32"}
+                          alt={user.displayName}
+                          className="w-8 h-8 rounded-full border border-gray-200"
+                        />
+                        <div className="ml-3 flex-1">
+                          <span className="text-sm text-gray-700 font-medium">{user.displayName}</span>
+                          {user.country && (
+                            <span className="text-xs text-gray-500 block">{user.country}</span>
+                          )}
+                        </div>
+                      </Link>
+                    ))}
+                    <div className="px-4 py-2 bg-gray-50">
+                      <button
+                        onClick={() => {
+                          setShowSuggestions(false);
+                          router.push(`/buscar?q=${encodeURIComponent(searchTerm)}`);
+                        }}
+                        className="w-full text-center text-sm text-[#315c99] hover:underline py-1 flex items-center justify-center"
+                      >
+                        <span>Ver todos os resultados</span>
+                        <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+            
             <button
               onClick={handleLogout}
               className="text-white hover:underline text-sm"
