@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import OrkutHeader from '@self/components/OrkutHeader';
@@ -26,6 +26,15 @@ export default function AmigosPage() {
   const [errorMessage, setErrorMessage] = useState('');
   const { currentUser } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Verificar parâmetros da URL para definir a aba ativa
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab === 'solicitacoes') {
+      setActiveTab('solicitacoes');
+    }
+  }, [searchParams]);
 
   // Carregar amigos e solicitações pendentes
   useEffect(() => {

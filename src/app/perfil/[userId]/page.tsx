@@ -12,7 +12,10 @@ import {
   getUserProfile, 
   UserProfile, 
   sendFriendRequest, 
-  getUserFriends 
+  getUserFriends,
+  acceptFriendRequest,
+  rejectFriendRequest,
+  getPendingFriendRequests
 } from '@self/firebase/userService';
 
 export default function PerfilUsuarioPage({ params }: { params: { userId: string } }) {
@@ -23,6 +26,7 @@ export default function PerfilUsuarioPage({ params }: { params: { userId: string
   const [successMessage, setSuccessMessage] = useState('');
   const [userFriends, setUserFriends] = useState<UserProfile[]>([]);
   const [friendRequestSent, setFriendRequestSent] = useState(false);
+  const [hasRequestFromUser, setHasRequestFromUser] = useState(false);
   const [isFriend, setIsFriend] = useState(false);
   const { currentUser } = useAuth();
   const router = useRouter();
@@ -76,6 +80,11 @@ export default function PerfilUsuarioPage({ params }: { params: { userId: string
         } else if (currentProfile?.pendingRequests?.includes(userId)) {
           setFriendRequestSent(true);
         }
+        
+        // Verificar se o usuário atual recebeu uma solicitação deste perfil
+        if (currentProfile?.friendRequests?.includes(userId)) {
+          setHasRequestFromUser(true);
+        }
       } catch (error) {
         console.error('Erro ao carregar perfil:', error);
         setErrorMessage('Erro ao carregar informações do perfil');
@@ -107,6 +116,57 @@ export default function PerfilUsuarioPage({ params }: { params: { userId: string
     } catch (error: any) {
       console.error('Erro ao adicionar amigo:', error);
       setErrorMessage(error.message || 'Erro ao enviar solicitação de amizade');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // Função para aceitar solicitação de amizade
+  const handleAcceptRequest = async () => {
+    if (!currentUser || !userProfile) return;
+    
+    setLoading(true);
+    setErrorMessage('');
+    setSuccessMessage('');
+    
+    try {
+      const success = await acceptFriendRequest(currentUser.uid, userProfile.uid);
+      
+      if (success) {
+        setHasRequestFromUser(false);
+        setIsFriend(true);
+        setSuccessMessage('Solicitação de amizade aceita com sucesso!');
+      } else {
+        setErrorMessage('Não foi possível aceitar a solicitação de amizade');
+      }
+    } catch (error: any) {
+      console.error('Erro ao aceitar solicitação:', error);
+      setErrorMessage(error.message || 'Erro ao aceitar solicitação de amizade');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // Função para rejeitar solicitação de amizade
+  const handleRejectRequest = async () => {
+    if (!currentUser || !userProfile) return;
+    
+    setLoading(true);
+    setErrorMessage('');
+    setSuccessMessage('');
+    
+    try {
+      const success = await rejectFriendRequest(currentUser.uid, userProfile.uid);
+      
+      if (success) {
+        setHasRequestFromUser(false);
+        setSuccessMessage('Solicitação de amizade rejeitada.');
+      } else {
+        setErrorMessage('Não foi possível rejeitar a solicitação de amizade');
+      }
+    } catch (error: any) {
+      console.error('Erro ao rejeitar solicitação:', error);
+      setErrorMessage(error.message || 'Erro ao rejeitar solicitação de amizade');
     } finally {
       setLoading(false);
     }
@@ -157,6 +217,26 @@ export default function PerfilUsuarioPage({ params }: { params: { userId: string
                       <span className="bg-gray-200 text-gray-700 text-xs px-3 py-1 rounded inline-block">
                         Amigos
                       </span>
+                    ) : hasRequestFromUser ? (
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <span className="text-xs text-gray-600 mb-1">Enviou solicitação:</span>
+                        <div className="flex gap-2">
+                          <button 
+                            className="bg-[#6d84b4] text-white text-xs px-3 py-1 rounded disabled:opacity-50"
+                            onClick={handleAcceptRequest}
+                            disabled={loading}
+                          >
+                            Aceitar
+                          </button>
+                          <button 
+                            className="bg-gray-200 text-gray-700 text-xs px-3 py-1 rounded disabled:opacity-50"
+                            onClick={handleRejectRequest}
+                            disabled={loading}
+                          >
+                            Rejeitar
+                          </button>
+                        </div>
+                      </div>
                     ) : friendRequestSent ? (
                       <span className="bg-gray-200 text-gray-700 text-xs px-3 py-1 rounded inline-block">
                         Solicitação enviada

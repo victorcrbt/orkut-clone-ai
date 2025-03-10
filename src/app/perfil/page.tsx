@@ -257,6 +257,29 @@ export default function PerfilPage() {
                       ))}
                     </div>
                   )}
+
+                  {/* Solicitações de amizade recebidas */}
+                  {userProfile?.friendRequests && userProfile.friendRequests.length > 0 && (
+                    <div className="mt-4">
+                      <div className="flex justify-between items-center mb-2">
+                        <h3 className="text-sm text-[#315c99] font-semibold">
+                          Solicitações pendentes ({userProfile.friendRequests.length})
+                        </h3>
+                        <Link href="/amigos?tab=solicitacoes" className="text-xs text-[#315c99] hover:underline">
+                          ver todas
+                        </Link>
+                      </div>
+                      
+                      <div className="bg-[#f0f7ff] border border-[#c9d6eb] rounded p-2">
+                        <p className="text-xs text-gray-600 mb-1">
+                          Você tem {userProfile.friendRequests.length} {userProfile.friendRequests.length === 1 ? 'solicitação' : 'solicitações'} de amizade pendente{userProfile.friendRequests.length !== 1 ? 's' : ''}.
+                        </p>
+                        <Link href="/amigos?tab=solicitacoes" className="text-xs bg-[#6d84b4] text-white px-3 py-1 rounded inline-block mt-1 hover:bg-[#5d74a4]">
+                          Responder agora
+                        </Link>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

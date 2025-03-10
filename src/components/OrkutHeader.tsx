@@ -3,13 +3,37 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../firebase/AuthContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { getPendingFriendRequests } from '../firebase/userService';
 
 export default function OrkutHeader() {
   const router = useRouter();
-  const { logout } = useAuth();
+  const { logout, currentUser } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [pendingRequestsCount, setPendingRequestsCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadPendingRequests = async () => {
+      if (!currentUser) {
+        setPendingRequestsCount(0);
+        setLoading(false);
+        return;
+      }
+      
+      try {
+        const requests = await getPendingFriendRequests(currentUser.uid);
+        setPendingRequestsCount(requests.length);
+      } catch (error) {
+        console.error('Erro ao carregar solicitações pendentes:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadPendingRequests();
+  }, [currentUser]);
 
   const handleLogout = async () => {
     try {
@@ -85,7 +109,16 @@ export default function OrkutHeader() {
             <li className="py-1 md:py-0"><Link href="/dashboard" className="text-white hover:underline text-[11px] block">Início</Link></li>
             <li className="py-1 md:py-0"><Link href="/perfil" className="text-white hover:underline text-[11px] block">Perfil</Link></li>
             <li className="py-1 md:py-0"><Link href="/buscar" className="text-white hover:underline text-[11px] block">Buscar amigos</Link></li>
-            <li className="py-1 md:py-0"><Link href="/amigos" className="text-white hover:underline text-[11px] block">Amigos</Link></li>
+            <li className="py-1 md:py-0">
+              <Link href="/amigos" className="text-white hover:underline text-[11px] block flex items-center">
+                Amigos
+                {pendingRequestsCount > 0 && (
+                  <span className="ml-1 bg-pink-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
+                    {pendingRequestsCount}
+                  </span>
+                )}
+              </Link>
+            </li>
             <li className="py-1 md:py-0"><Link href="#" className="text-white hover:underline text-[11px] block">Comunidades</Link></li>
           </ul>
         </nav>

@@ -10,10 +10,12 @@ import OrkutFooter from '@self/components/OrkutFooter';
 import ProtectedRoute from '@self/components/ProtectedRoute';
 import { useAuth } from '@self/firebase/AuthContext';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
+import { getPendingFriendRequests } from '@self/firebase/userService';
 
 export default function Dashboard() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [pendingRequestsCount, setPendingRequestsCount] = useState(0);
   const { currentUser } = useAuth();
   const router = useRouter();
 
@@ -53,6 +55,10 @@ export default function Dashboard() {
             country: userData.country,
             profileCompleted: userData.profileCompleted
           });
+          
+          // Carregar solicitações de amizade pendentes
+          const friendRequests = await getPendingFriendRequests(currentUser.uid);
+          setPendingRequestsCount(friendRequests.length);
         } else {
           // Se não encontrar os dados no Firestore, verificar o sessionStorage
           const storedUser = sessionStorage.getItem('currentUser');
@@ -98,6 +104,21 @@ export default function Dashboard() {
       <div className="min-h-screen flex flex-col bg-[#e8eefa]">
         {/* Usar o componente OrkutHeader */}
         <OrkutHeader />
+
+        {/* Notificação de solicitações de amizade pendentes */}
+        {pendingRequestsCount > 0 && (
+          <div className="mb-4 bg-white border border-pink-200 rounded-md p-3 flex items-center justify-between">
+            <div className="flex items-center">
+              <span className="text-pink-500 mr-2 text-xl">🔔</span>
+              <p className="text-sm">
+                Você tem {pendingRequestsCount} {pendingRequestsCount === 1 ? 'solicitação' : 'solicitações'} de amizade pendente{pendingRequestsCount !== 1 ? 's' : ''}.
+              </p>
+            </div>
+            <Link href="/amigos?tab=solicitacoes" className="bg-[#6d84b4] text-white text-xs px-3 py-1 rounded hover:bg-[#5d74a4]">
+              Ver agora
+            </Link>
+          </div>
+        )}
 
         {/* Conteúdo principal */}
         <main className="flex-1 max-w-6xl mx-auto p-4">
