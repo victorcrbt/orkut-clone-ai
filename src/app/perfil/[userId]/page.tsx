@@ -17,6 +17,7 @@ import {
   rejectFriendRequest,
   getPendingFriendRequests
 } from '@self/firebase/userService';
+import { getUserCommunities, Community } from '@self/firebase/communityService';
 
 export default function PerfilUsuarioPage({ params }: { params: { userId: string } }) {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
@@ -25,6 +26,7 @@ export default function PerfilUsuarioPage({ params }: { params: { userId: string
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [userFriends, setUserFriends] = useState<UserProfile[]>([]);
+  const [userCommunities, setUserCommunities] = useState<Community[]>([]);
   const [friendRequestSent, setFriendRequestSent] = useState(false);
   const [hasRequestFromUser, setHasRequestFromUser] = useState(false);
   const [isFriend, setIsFriend] = useState(false);
@@ -69,6 +71,10 @@ export default function PerfilUsuarioPage({ params }: { params: { userId: string
         // Carregar amigos do usuário
         const friends = await getUserFriends(userId);
         setUserFriends(friends);
+        
+        // Buscar comunidades do usuário
+        const communities = await getUserCommunities(userId);
+        setUserCommunities(communities);
         
         // Carregar perfil do usuário atual
         const currentProfile = await getUserProfile(currentUser.uid);
@@ -378,6 +384,43 @@ export default function PerfilUsuarioPage({ params }: { params: { userId: string
                             </div>
                             <span className="text-xs text-[#315c99] hover:underline line-clamp-1">
                               {friend.displayName}
+                            </span>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Comunidades */}
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <h3 className="text-sm text-[#315c99] font-semibold">Comunidades ({userCommunities.length})</h3>
+                      {userCommunities.length > 9 && (
+                        <Link href={`/perfil/${userId}/comunidades`} className="text-xs text-[#315c99] hover:underline">
+                          ver todas
+                        </Link>
+                      )}
+                    </div>
+                    
+                    {userCommunities.length === 0 ? (
+                      <p className="text-xs text-gray-500 italic">
+                        Este usuário ainda não participa de comunidades.
+                      </p>
+                    ) : (
+                      <div className="grid grid-cols-3 sm:grid-cols-3 gap-2">
+                        {userCommunities.slice(0, 9).map((community) => (
+                          <Link href={`/comunidades/${community.id}`} key={community.id} className="text-center">
+                            <div className="mb-1">
+                              <Image
+                                src={community.photoURL || `https://via.placeholder.com/50x50/6e83b7/FFFFFF?text=${community.name.substring(0, 1)}`}
+                                alt={community.name}
+                                width={50}
+                                height={50}
+                                className="border border-gray-300 mx-auto"
+                              />
+                            </div>
+                            <span className="text-xs text-[#315c99] hover:underline line-clamp-1">
+                              {community.name}
                             </span>
                           </Link>
                         ))}

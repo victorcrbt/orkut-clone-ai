@@ -11,79 +11,77 @@ import ProtectedRoute from '@self/components/ProtectedRoute';
 import { useAuth } from '@self/firebase/AuthContext';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { getPendingFriendRequests, getUserFriends, UserProfile } from '@self/firebase/userService';
+import { getUserCommunities, Community } from '@self/firebase/communityService';
 
 export default function Dashboard() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [pendingRequestsCount, setPendingRequestsCount] = useState(0);
   const [userFriends, setUserFriends] = useState<UserProfile[]>([]);
+  const [userCommunities, setUserCommunities] = useState<Community[]>([]);
   const { currentUser } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    const checkProfileAndLoadUser = async () => {
-      if (!currentUser) {
-        setLoading(false);
+    if (currentUser) {
+      checkProfileAndLoadUser();
+    }
+  }, [currentUser]);
+
+  const checkProfileAndLoadUser = async () => {
+    if (!currentUser) return;
+    
+    setLoading(true);
+    
+    try {
+      const db = getFirestore();
+      const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+      
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        
+        if (!userData.profileCompleted) {
+          // Redirecionar para completar o perfil
+          router.push('/perfil/completar');
+          return;
+        }
+        
+        setUser({
+          id: currentUser.uid,
+          email: currentUser.email || '',
+          name: userData.displayName || '',
+          profilePicture: userData.photoURL || '',
+          password: '',
+          birthDate: userData.birthDate,
+          gender: userData.gender,
+          relationship: userData.relationship,
+          bio: userData.bio || '',
+          country: userData.country || '',
+          profileCompleted: true
+        });
+        
+        // Buscar solicitações de amizade pendentes
+        const pendingRequests = await getPendingFriendRequests(currentUser.uid);
+        setPendingRequestsCount(pendingRequests.length);
+        
+        // Buscar amigos do usuário
+        const friends = await getUserFriends(currentUser.uid);
+        setUserFriends(friends);
+        
+        // Buscar comunidades do usuário
+        const communities = await getUserCommunities(currentUser.uid);
+        setUserCommunities(communities);
+      } else {
+        // Usuário não existe, redirecionar para completar o perfil
+        router.push('/perfil/completar');
         return;
       }
-      
-      try {
-        // Verificar se o perfil está completo no Firestore
-        const db = getFirestore();
-        const userRef = doc(db, "users", currentUser.uid);
-        const userSnap = await getDoc(userRef);
-        
-        if (userSnap.exists()) {
-          const userData = userSnap.data();
-          
-          // Se o perfil não estiver completo, redirecionar
-          if (userData.profileCompleted !== true) {
-            router.push('/complete-profile');
-            return;
-          }
-          
-          // Usar os dados do Firestore para o usuário - incluindo dados sociais
-          setUser({
-            id: userData.uid,
-            email: userData.email,
-            name: userData.displayName,
-            profilePicture: userData.photoURL,
-            password: '', // Campo obrigatório na interface, mas não usado
-            birthDate: userData.birthDate,
-            gender: userData.gender,
-            relationship: userData.relationship,
-            bio: userData.bio,
-            country: userData.country,
-            profileCompleted: userData.profileCompleted
-          });
-          
-          // Carregar solicitações de amizade pendentes
-          const friendRequests = await getPendingFriendRequests(currentUser.uid);
-          setPendingRequestsCount(friendRequests.length);
-          
-          // Carregar lista de amigos
-          const friends = await getUserFriends(currentUser.uid);
-          setUserFriends(friends);
-        } else {
-          // Se não encontrar os dados no Firestore, verificar o sessionStorage
-          const storedUser = sessionStorage.getItem('currentUser');
-          if (storedUser) {
-            setUser(JSON.parse(storedUser));
-          } else {
-            // Se não tiver dados em lugar nenhum, redirecionar para completar perfil
-            router.push('/complete-profile');
-            return;
-          }
-        }
-      } catch (error) {
-        console.error("Erro ao carregar dados do usuário:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    checkProfileAndLoadUser();
-  }, [currentUser, router]);
+    } catch (error) {
+      console.error("Erro ao verificar perfil:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -309,42 +307,66 @@ export default function Dashboard() {
                   )}
                 </div>
                 
-                <div>
+                <div className="mb-4">
                   <div className="flex justify-between items-center mb-2">
                     <h3 className="text-xs font-bold text-[#315c99]">
-                      minhas comunidades <span className="text-[#315c99]">(2)</span>
+                      minhas comunidades <span className="text-[#315c99]">({userCommunities.length})</span>
                     </h3>
                     <div className="flex items-center">
                       <Link href="/comunidades" className="text-[10px] text-[#315c99] hover:underline mr-1">ver todas</Link>
                       <Link href="/comunidades/gerenciar" className="text-[10px] text-[#315c99] hover:underline">gerenciar</Link>
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="text-center">
-                      <div className="w-14 h-14 mx-auto mb-1 overflow-hidden">
-                        <Image
-                          src="https://via.placeholder.com/64x64/9D7E64/FFFFFF?text=Chocolate"
-                          alt="EU AMO CHOCOLATE"
-                          width={56}
-                          height={56}
-                          className="border border-gray-300"
-                        />
-                      </div>
-                      <p className="text-[10px] text-[#315c99] hover:underline">EU AMO CHOCOLATE</p>
+                  
+                  {userCommunities.length === 0 ? (
+                    <div>
+                      <p className="text-[11px] text-gray-600 mb-1">você ainda não participa de nenhuma comunidade</p>
+                      <Link href="/comunidades" className="inline-block mt-1 text-[11px] text-white bg-[#6d84b4] px-2 py-1 rounded-sm hover:bg-[#5b71a0]">
+                        descobrir comunidades
+                      </Link>
                     </div>
-                    <div className="text-center">
-                      <div className="w-14 h-14 mx-auto mb-1 overflow-hidden">
-                        <Image
-                          src="https://via.placeholder.com/64x64/6e83b7/FFFFFF?text=Dev"
-                          alt="Desenvolvedores"
-                          width={56}
-                          height={56}
-                          className="border border-gray-300"
-                        />
-                      </div>
-                      <p className="text-[10px] text-[#315c99] hover:underline">Desenvolvedores</p>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-2">
+                      {userCommunities.slice(0, 2).map((community) => (
+                        <div key={community.id} className="text-center">
+                          <div className="w-14 h-14 mx-auto mb-1 overflow-hidden">
+                            <Image
+                              src={community.photoURL || `https://via.placeholder.com/64x64/6e83b7/FFFFFF?text=${community.name.substring(0, 1)}`}
+                              alt={community.name}
+                              width={56}
+                              height={56}
+                              className="border border-gray-300"
+                            />
+                          </div>
+                          <Link href={`/comunidades/${community.id}`} className="text-[10px] text-[#315c99] hover:underline">
+                            {community.name}
+                          </Link>
+                        </div>
+                      ))}
                     </div>
-                  </div>
+                  )}
+                </div>
+
+                {/* Informações rápidas */}
+                <div className="bg-[#f1f9ff] p-3 rounded mb-4">
+                  <h3 className="text-[#315c99] text-xs font-bold mb-2">informações</h3>
+                  <ul className="text-[11px] space-y-1">
+                    <li>
+                      <span className="text-gray-500">amigos:</span> <Link href="/amigos" className="text-[#315c99] hover:underline">{userFriends.length}</Link>
+                    </li>
+                    <li>
+                      <span className="text-gray-500">comunidades:</span> <Link href="/comunidades" className="text-[#315c99] hover:underline">{userCommunities.length}</Link>
+                    </li>
+                    <li>
+                      <span className="text-gray-500">recados:</span> <Link href="#" className="text-[#315c99] hover:underline">0</Link>
+                    </li>
+                    <li>
+                      <span className="text-gray-500">fotos:</span> <Link href="#" className="text-[#315c99] hover:underline">0</Link>
+                    </li>
+                    <li>
+                      <span className="text-gray-500">vídeos:</span> <Link href="#" className="text-[#315c99] hover:underline">0</Link>
+                    </li>
+                  </ul>
                 </div>
               </div>
             </div>

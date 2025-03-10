@@ -39,7 +39,11 @@ const UserProfileForm = ({ onComplete }: UserProfileFormProps) => {
         country,
         displayNameLower: name.toLowerCase(),
         profileCompleted: true,
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
+        friends: [],
+        friendRequests: [],
+        pendingRequests: [],
+        communities: []
       };
       
       const db = getFirestore();
