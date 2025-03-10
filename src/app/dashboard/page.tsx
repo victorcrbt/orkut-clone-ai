@@ -312,10 +312,7 @@ export default function Dashboard() {
                     <h3 className="text-xs font-bold text-[#315c99]">
                       minhas comunidades <span className="text-[#315c99]">({userCommunities.length})</span>
                     </h3>
-                    <div className="flex items-center">
-                      <Link href="/comunidades" className="text-[10px] text-[#315c99] hover:underline mr-1">ver todas</Link>
-                      <Link href="/comunidades/gerenciar" className="text-[10px] text-[#315c99] hover:underline">gerenciar</Link>
-                    </div>
+                    <Link href="/comunidades" className="text-[10px] text-[#315c99] hover:underline">ver todas</Link>
                   </div>
                   
                   {userCommunities.length === 0 ? (
@@ -329,27 +326,34 @@ export default function Dashboard() {
                       </Link>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-2 gap-2">
-                      {userCommunities.slice(0, 2).map((community) => (
-                        <div key={community.id} className="text-center group">
-                          <div className="w-14 h-14 mx-auto mb-1 overflow-hidden transition-transform group-hover:scale-105">
-                            <Image
-                              src={community.photoURL || `https://via.placeholder.com/64x64/6e83b7/FFFFFF?text=${community.name.substring(0, 1)}`}
-                              alt={community.name}
-                              width={56}
-                              height={56}
-                              className="border border-gray-300"
-                            />
+                    <>
+                      <div className="grid grid-cols-2 gap-2 mb-2">
+                        {userCommunities.slice(0, 2).map((community) => (
+                          <div key={community.id} className="text-center group">
+                            <div className="w-14 h-14 mx-auto mb-1 overflow-hidden transition-transform group-hover:scale-105">
+                              <Image
+                                src={community.photoURL || `https://via.placeholder.com/64x64/6e83b7/FFFFFF?text=${community.name.substring(0, 1)}`}
+                                alt={community.name}
+                                width={56}
+                                height={56}
+                                className="border border-gray-300"
+                              />
+                            </div>
+                            <Link 
+                              href={`/comunidades/${community.id}`} 
+                              className="text-[10px] text-[#315c99] hover:underline line-clamp-1"
+                            >
+                              {community.name}
+                            </Link>
                           </div>
-                          <Link 
-                            href={`/comunidades/${community.id}`} 
-                            className="text-[10px] text-[#315c99] hover:underline line-clamp-1"
-                          >
-                            {community.name}
-                          </Link>
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                      <div className="text-center">
+                        <Link href="/comunidades/gerenciar" className="text-[10px] text-[#315c99] hover:underline">
+                          gerenciar
+                        </Link>
+                      </div>
+                    </>
                   )}
                 </div>
               </div>
