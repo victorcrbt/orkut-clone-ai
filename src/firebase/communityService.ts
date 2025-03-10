@@ -47,12 +47,20 @@ export interface CommunityMember extends UserProfile {
  */
 export async function createCommunity(communityData: Omit<Community, 'id' | 'createdAt' | 'members' | 'moderators'>): Promise<string | null> {
   try {
+    // Remover campos undefined antes de salvar no Firestore
+    const cleanData = { ...communityData };
+    
+    // Se photoURL for undefined, removê-lo do objeto
+    if (cleanData.photoURL === undefined) {
+      delete cleanData.photoURL;
+    }
+    
     const newCommunity: Omit<Community, 'id'> = {
-      ...communityData,
-      nameLower: communityData.name.toLowerCase(),
+      ...cleanData,
+      nameLower: cleanData.name.toLowerCase(),
       createdAt: Timestamp.now(),
-      members: [communityData.createdBy], // Criador já é membro
-      moderators: [communityData.createdBy], // Criador já é moderador
+      members: [cleanData.createdBy], // Criador já é membro
+      moderators: [cleanData.createdBy], // Criador já é moderador
     };
     
     const communityRef = collection(db, "communities");
@@ -60,7 +68,7 @@ export async function createCommunity(communityData: Omit<Community, 'id' | 'cre
     
     // Atualizar o usuário que criou para incluir esta comunidade
     try {
-      const userRef = doc(db, "users", communityData.createdBy);
+      const userRef = doc(db, "users", cleanData.createdBy);
       const userDoc = await getDoc(userRef);
       
       if (userDoc.exists()) {

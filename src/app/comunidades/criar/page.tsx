@@ -87,13 +87,16 @@ export default function CriarComunidadePage() {
     setSuccess(null);
     
     try {
+      // Gerar uma URL de imagem padrão baseada na primeira letra do nome da comunidade
+      const defaultPhotoURL = `https://via.placeholder.com/200x200/6e83b7/FFFFFF?text=${formData.name.trim().charAt(0).toUpperCase()}`;
+      
       const communityData = {
         name: formData.name.trim(),
         description: formData.description.trim(),
         category: formData.category,
         isPublic: formData.isPublic,
         createdBy: currentUser.uid,
-        photoURL: undefined // Usar undefined em vez de null para corresponder à tipagem
+        photoURL: defaultPhotoURL // Definir uma imagem padrão
       };
       
       const communityId = await createCommunity(communityData);
